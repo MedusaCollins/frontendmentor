@@ -1,0 +1,136 @@
+:root{
+    --clr-softblue: hsl(215, 51%, 70%);
+    --clr-cyan: hsl(178, 100%, 50%);
+
+    --clr-dark-blue-01: hsl(217, 54%, 11%);
+    --clr-dark-blue-02: hsl(216, 50%, 16%);
+    --clr-dark-blue-03: hsl(215, 32%, 27%);
+    --clr-white: hsl(0, 0%, 100%);
+
+    --fw-thin: 300;
+    --fw-reg: 400;
+    --fw-bold: 600;
+
+    --fs: 18px;
+}
+
+body{
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--clr-dark-blue-01);
+    color: var(--clr-softblue);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+h3,span{
+    color: var(--clr-white);
+}
+
+ .container{
+    background-color: var(--clr-dark-blue-02);
+    width: 300px;
+    height: fit-content;
+    padding: 1em;
+    margin: 3em 0;
+    border-radius: 20px;
+    justify-items: center;
+    box-shadow: rgba(0, 0, 0, 0.2) 5px 10px 20px, rgba(0, 0, 0, 0.2) 5px 10px 20px;
+}
+
+.container img {
+    max-width: 100%;
+    border-radius: 10px;
+    z-index: 100;
+}
+
+.nft-container{
+    position: relative;
+    background-color: var(--clr-cyan);
+    border-radius: 13px;
+    width: 100%;
+    height: 100%;
+}
+
+.nft-container-item{
+    display: block;
+}
+
+.nft-overlay{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    opacity: 0;
+}
+
+.nft-overlay-item{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+}
+.nft-container:hover .nft-container-item{
+    opacity: 60%;
+}
+
+.nft-container:hover .nft-overlay{
+    opacity: 1;
+    cursor: pointer;
+}
+/* Price */
+.price-container{
+    display: flex;
+    justify-content: space-between;
+    margin: 1em 0;
+}
+.price-container img{
+    margin: -3px 0;
+}
+.eth{
+    color: var(--clr-cyan);
+}
+.clock{
+    color: var(--clr-softblue);
+}
+
+/* Profile */
+.creator-container{
+    border-style: solid none none none;
+    border-width: 1px;
+    border-color: var(--clr-dark-blue-03);
+    display: flex;
+    gap: 14px;
+    padding: 1em;
+}
+
+.creator-container .avatar{
+    width: 30px;
+    height: 30px;
+    border: solid var(--clr-white);
+    border-radius: 100%;
+}
+.creator-container .text{
+    margin: 0.5em 0;
+    font-size: 0.9rem;
+    font-weight: var(--fw-thin);
+}
+
+/* Desktop */
+@media (min-width: 400px){
+    .container{
+        margin: 10em 0;
+    }
+}
+
+.text p{
+    display: inline;
+    color: var(--clr-white);
+}
+/* Hover Effects */
+.text p:hover, h3:hover{
+    color: var(--clr-cyan);
+    cursor: pointer;
+}

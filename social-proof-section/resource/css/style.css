@@ -1,0 +1,236 @@
+:root{
+    --clr-s-pink: hsl(333, 80%, 67%);
+    --clr-d-pink: hsl(300, 43%, 22%);
+
+    --clr-lg-magenta: hsl(300, 24%, 96%);
+    --clr-dg-magenta: hsl(303, 10%, 53%);
+    --clr-white: hsl(0, 0%, 100%);
+
+    --fw-thin: 400;
+    --fw-reg: 500;
+    --fw-bold: 700;
+
+    --fs: 15px;
+}
+
+body{
+    font-family: 'League Spartan', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: var(--fs);
+}
+
+.main-container{
+    position: absolute;
+    width: 100%;
+    top: 70px;
+    text-align: center;
+    justify-items: center;
+    justify-content: center;
+}
+
+/* Summary */
+.summary{
+    position: relative;
+    margin: 0 2em;
+    margin-bottom: 2em;
+    
+}
+
+.summary h2{
+    font-weight: var(--fw-bold);
+    color: var(--clr-d-pink);
+    margin: 0.5em 1em;
+    font-size: 30px;
+}
+
+.summary span{
+    font-weight: var(--fw-reg);
+    color: var(--clr-dg-magenta);
+    font-size: var(--fs);
+    line-height: 20px;
+}
+
+/* Rating */
+.review{
+    background-color: var(--clr-lg-magenta);
+    color: var(--clr-d-pink);
+    font-weight: var(--fw-bold);
+    margin: 1em 2em;
+    height: 50px;
+    border-radius: 10px;
+    padding: 5px;
+    padding-bottom: 10px;
+    
+}
+
+.stars{
+    display: block;
+    margin: 0.5em 0em;
+}
+
+/* Customers */
+.container-customers{
+    margin-top: 3em;
+}
+.customers{
+    background-color: var(--clr-d-pink);
+    color: var(--clr-white);
+    margin: 1em 2em;
+    border-radius: 10px;
+    text-align: left;
+    padding: 1.5em;
+}
+
+.customers-profile{
+    display: flex;
+    line-height: 2px;
+    height: 70px;
+    gap: 14px;
+}
+
+.customers-img{
+    border-radius: 100px;
+    width: 30px;
+    height: 30px;
+    margin-top: 14px;
+}
+
+.customers-name h3{
+    font-weight: var(--fw-reg);
+    font-size: 14px;
+    margin-top: 1.5em;
+    color: var(--clr-white);
+}
+.customers-name span{
+    font-weight: var(--fw-reg);
+    font-size: 13px;
+    color: var(--clr-s-pink);
+}
+
+.customers-comment{
+    line-height: 20px;
+}
+
+
+/* Desktop Design */
+@media (max-width: 1050px){
+    .d-br{
+        display: none;
+    }
+    .d-background{
+        display: none;
+    }
+}
+@media (min-width: 1050px){
+    
+    .m-br{
+        display: none;
+    }
+
+    /* Container */
+    .grid-container{
+        display: grid;
+        grid-template-columns: auto auto;
+    }
+
+    .main-container{
+        margin-top: 10em;
+        max-width: 1000px
+    }
+
+    /* Summary */
+    .summary{
+        text-align: left;
+        margin-bottom: 2em;
+        margin-right: 0;
+        margin: 0;
+        max-width: max-content;
+        
+    }
+
+    .summary h2{
+        margin: 0.5em 0em;
+        font-size: 45px;
+    }
+
+    /* Rating */
+
+    .container-rates{
+        position: relative;
+        margin-left: 0;
+    }
+    .review{
+        padding: 1em 0em;
+        height: 40px;
+        margin-left: 40%;
+        padding-bottom: 0; 
+        margin-right: 0;
+        width: 60%;
+    }
+    .stars{
+        display: inline;
+        margin-right: 30px;
+    }
+    .review-1{
+        margin-left: 180px;
+    }
+    .review-2{
+        margin-left: 210px;
+    }
+    /* Comment */
+    .container-customers{
+        display: flex;
+        margin: 4em 0;
+        justify-items: center;
+        justify-content: center;
+    }
+    .customers{
+        margin: 0.5em;
+        max-width: 30vh;
+        max-height: 160px;
+    }
+    .customers-1{
+        margin-top: 0px;
+    }
+    .customers-2{
+        margin-top: 20px;
+    }
+    .customers-3{
+        margin-top: 40px;
+    }
+
+    /* Background */
+    .d-background{
+        position: relative;
+    }
+
+    .background-top{
+        position: fixed;
+        top: 0px;
+        margin-left: -40vh;
+    }
+    .background-bottom{
+        position: fixed;
+        bottom: 0;
+    }
+    /* Colors */
+        /* .summary{
+            background-color: azure;
+        }
+        .container-customers{
+            background-color: antiquewhite;
+        }
+        .container-rates{
+            background-color: red;
+        }
+        .grid-container{
+            background-color: blueviolet;
+        }
+
+        .main-container{
+            background-color: aquamarine;
+        } */
+}
+

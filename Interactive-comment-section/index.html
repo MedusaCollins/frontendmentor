@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- displays site properly based on user's device -->
+
+  <link rel="icon" type="image/png" sizes="32x32" href="./resource/images/favicon-32x32.png">
+  <link rel="stylesheet" href="/resource/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+  <title>Frontend Mentor | Interactive comments section</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* The modal overlay */
+    .modal-overlay {
+      /* Position the overlay */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 50; /* Higher than the modal */
+    }
+  
+    /* Style for the modal content box */
+    .modal-content {
+      /* Add your desired width and other styles here */
+      width: 400px;
+    }
+    
+    </style>
+</head>
+<body class="bg-[#eaecf1]">
+  <main class="relative gap-1 mx-auto w-1/2 mt-32 rounded mb-0" id="jsonContainer">
+    <div id="message"></div>
+  </main>
+  <div id="comments"></div>
+  <div id="myModal" class="modal-overlay hidden" onclick="closeModal()">
+    <div class="bg-white p-8 rounded shadow-lg w-[400px]" onclick="event.stopPropagation();">
+      <span class="absolute top-4 right-4 cursor-pointer text-gray-600" onclick="closeModal()">&times;</span>
+      <p id="modalText" class="text-xl mb-4"><strong>Delete Comment</strong></p>
+      <p id="modalText" class="text-lg mb-4">Are you sure you want to delete this comment? This will remove the comment and can't be undone.</p>
+      <input type="hidden" id="commentIdToDelete" />
+      <input type="hidden" id="replyIdToDelete" />
+      <div class="flex gap-5 items-center justify-center">
+        <button class="bg-gray-500 hover:bg-gray-600 text-white px-5 py-3 rounded font-semibold" onclick="closeModal()">NO, CANCEL</button>
+        <button class="bg-red-500 hover:bg-red-600 text-white px-5 py-3 rounded font-semibold" onclick="confirmDelete()">YES, DELETE</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    
+    // 'data' değişkenini global alanda tanımlıyoruz
+    let data;
+    // Global bir flag oluşturalım ve edit işlemi başlamadığında false olarak başlatıp, kaydetme işlemi tamamlandığında true yapalım.
+    let isEditing = false;
+    // Yukarıda tanımladığınız "createdReplySet" yerine aşağıdaki dizi kullanılacak
+    let isReplying = false;
+    var commentId = "100";
+    var replyId = "100";
+
+    var test1 ="200";
+    var test2 ="201";
+    var test3 ="4";
+    var score = "0";
+    let createdReplyForms = [];
+
+    // Yanıtlama alanı oluşturulan yorumların ID'lerini saklamak için bir Set kullanalım
+    const createdReplySet = new Set();
+
+async function fetchAndUpdateScore() {
+try {
+    // data.json dosyasına HTTP isteği yapıyoruz ve gelen veriyi JSON formatında alıyoruz
+    const response = await fetch('data.json');
+    const data = await response.json();
+    const comments = data.comments;
+
+    // jsonContainer adlı div elementini alıyoruz
+    const container = document.getElementById('jsonContainer');
+    container.innerHTML = ''; // Önceki içeriği temizle
+
+    // Yorumları ve cevapları oluşturuyoruz
+    if (comments && comments.length > 0) {
+        comments.forEach(comment => {
+            const commentId = comment.id;
+            const commentContent = comment.content;
+            let score = comment.score;
+            const currentUserImage = data.currentUser.image.png;
+            const currentUser = data.currentUser.username;
+          
+            const commentDiv = document.createElement('div');
+            commentDiv.setAttribute('id', `comment-${commentId}`);
+            commentDiv.innerHTML = `
+                <div class="grid grid-rows-1 grid-flow-col bg-white rounded mt-5">
+                    <div class="row-span-3 my-auto w-6/12 max-w-[30px] flex flex-col mx-5 px-2 bg-[#eaecf1] rounded-md text-[#c3c4ef] font-bold">
+                        <button class="hover:text-indigo-700" onclick="increaseScore(${commentId})">+</button>
+                        <strong class="text-[#5457b6] mx-auto" id="score-${commentId}">${score}</strong>
+                        <button class="hover:text-indigo-700" onclick="decreaseScore(${commentId})">-</button>
+                    </div>
+                    <div class="col-span-2 flex pr-5 py-5 items-center">
+                        <img src="${comment.user.image.png}" alt="${comment.user.username}" class="w-10 mr-5"> 
+                        ${
+                            comment.user.username === currentUser
+                                ? `<strong class="text-[#324152]">${comment.user.username}</strong><div class="text-white text-sm bg-indigo-800 pb-1 px-3 mx-2 rounded">you</div> <p class="text-[#67727e]">${comment.createdAt}</p>
+                                <button class="ml-auto flex text-red-500 items-center gap-2 mr-3" onclick="deleteComment(${commentId})"><img src="./resource/images/icon-delete.svg" alt=""> <strong>Delete</strong></button>
+                                  <button class="ml-3 flex text-[#5457b6] items-center gap-2" onclick="editComment(${commentId})"><img src="./resource/images/icon-edit.svg" alt=""><strong>Edit</strong></button>`
+                                : `<strong class="text-[#324152] mr-5">${comment.user.username}</strong><p class="text-[#67727e]">${comment.createdAt}</p>
+
+                                ${comment.replies && comment.replies.length > 0
+                                    ? `<button onclick="replyComment('${currentUser}','${currentUserImage}', ${commentId}, ${test3})" class="ml-auto flex text-[#5457b6]"><img src="./resource/images/icon-reply.svg" alt="reply button" class="mt-1 mr-2"><strong>Reply</strong></button>`
+                                    : `<button onclick="replyComment('${currentUser}','${currentUserImage}', ${commentId})" class="ml-auto flex text-[#5457b6]"><img src="./resource/images/icon-reply.svg" alt="reply button" class="mt-1 mr-2"><strong>Reply</strong></button>`
+                                }`
+                        }
+                    </div>
+                    <div class="comment-content row-span-2 col-span-1 mb-5 text-[#67727e]">${commentContent}</div>
+                </div>
+            `;
+
+            if (comment.replies && comment.replies.length > 0) {
+                const repliesDiv = document.createElement('div');
+                
+                repliesDiv.setAttribute('class', 'grid border-l-2 ml-12 mt-5 gap-5 border-gray-300');
+                comment.replies.forEach(reply => {
+                    const replyId = reply.id;
+                    const replyUserImage = reply.user.image.png;
+                    const replyUsername = reply.user.username;
+                    const replyContent = reply.content;
+                    const replyCreatedAt = reply.createdAt;
+                    const replyingTo = reply.replyingTo;
+                    let replyScore = reply.score;
+
+                    const test444 = document.createElement('div');
+                    const replyDiv = document.createElement('div');
+                    replyDiv.setAttribute('id', `reply-${replyId}`);
+                    test444.setAttribute('id', `comment-${replyId}`);
+                    replyDiv.innerHTML = `
+                        <article class="rounded-md w-[95%] ml-auto ">
+                            <div class="grid grid-rows-1 grid-flow-col gap-0 bg-white rounded">
+                                <div class="row-span-3 w-[26px] my-auto flex flex-col mx-5 px-2 bg-[#eaecf1] rounded-md text-[#c3c4ef] font-bold">
+                                    <button class="hover:text-indigo-700" onclick="increaseScoreReply(${commentId}, ${replyId})">+</button>
+                                    <strong class="text-[#5457b6]" id="score-${replyId}">${replyScore}</strong>
+                                    <button class="hover:text-indigo-700" onclick="decreaseScoreReply(${commentId}, ${replyId})">-</button>
+                                </div>
+                                <div class="col-span-2 flex pr-5 py-5 items-center">
+                                    <img src="${replyUserImage}" alt="${replyUsername}" class="w-10 mr-5">
+                                    <strong class=" text-[#324152]">${replyUsername}</strong>
+                                    ${
+                                        reply.user.username === currentUser
+                                            ? `<div class="text-white text-sm bg-indigo-800 pb-1 px-3 mx-2 rounded">you</div> <p class="text-[#67727e]">${comment.createdAt}</p>
+                                            <button class="ml-auto flex text-red-500 items-center gap-2 mr-3" onclick="deleteComment(${commentId}, ${replyId})"><img src="./resource/images/icon-delete.svg" alt=""> <strong>Delete</strong></button>
+                                            <button class="ml-3 flex text-[#5457b6] items-center gap-2" onclick="editComment(${commentId})"><img src="./resource/images/icon-edit.svg" alt=""><strong>Edit</strong></button>`
+                                            : `<p class="text-[#67727e] mx-5">${comment.createdAt}</p>
+                                            <button onclick="replyComment('${currentUser}','${currentUserImage}', ${commentId}, ${test3})" class="ml-auto flex text-[#5457b6]"><img src="./resource/images/icon-reply.svg" alt="reply button" class="mt-1 mr-2"><strong>Reply</strong></button>`
+                                    }
+                                    </div>
+                                <div class="row-span-2 col-span-1 mb-5 text-[#67727e] reply-content"><strong class="text-blue-800">@${replyingTo}</strong> ${replyContent}</div>
+                            </div>
+                        </article>
+                    `;
+                    
+                    repliesDiv.appendChild(replyDiv);
+                    replyDiv.appendChild(test444);
+                });
+
+                commentDiv.appendChild(repliesDiv);
+            }
+
+            container.appendChild(commentDiv);
+        });
+    }
+
+    // Oturum açan kullanıcının bilgilerini alıyoruz
+    const currentUserImage = data.currentUser.image.png;
+    const currentUserUsername = data.currentUser.username;
+
+    // Oturum açan kullanıcının bölümünü oluşturuyoruz
+    const currentUserHTML = `
+        <div class="w-full bg-white rounded flex mt-5 pb-5 pt-5 items-center mb-24">
+                <img src="${currentUserImage}" alt="${currentUserUsername}" class="w-10 ml-5">
+                <input type="text" id="newCommentContent" placeholder="Add a comment..." class="border border-slate-200 placeholder-slate-400 contrast-more:border-slate-400 contrast-more:placeholder-slate-500 w-3/4 my-auto mt-2 p-5 mx-auto">
+                <button onclick="sendNewComment('${currentUserUsername}', '${currentUserImage}')" class="ml-auto bg-indigo-800 text-white h-10 inline-flex items-center px-5 rounded mr-5"><strong>SEND</strong></button>
+        </div>
+    `;
+    container.innerHTML += currentUserHTML;
+}
+ catch (error) {
+    console.error('Error fetching data:', error);
+}}
+
+
+
+function sendNewComment(currentUserUsername, currentUserImage) {
+  // Input alanındaki değeri alın
+  var inputElement = document.getElementById("newCommentContent");
+  var message = inputElement.value;
+
+  // Yeni bir div öğesi oluşturun
+  var newMessage = document.createElement("div");
+  newMessage.setAttribute('id', `comment-${commentId}`);
+
+  // Yeni div'in içeriğini ayarlayın
+  newMessage.innerHTML = `
+    <article class="rounded-md w-[95%] ml-auto mt-5">
+      <div class="grid grid-rows-1 grid-flow-col bg-white rounded mt-5">
+        <div class="row-span-3 my-auto w-6/12 max-w-[30px] flex flex-col mx-5 px-2 bg-[#eaecf1] rounded-md text-[#c3c4ef] font-bold">
+          <button class="hover:text-indigo-700" onclick="increaseScore(${commentId})">+</button>
+          <strong class="text-[#5457b6]" id="score-${commentId}">${score}</strong>
+          <button class="hover:text-indigo-700" onclick="decreaseScore(${commentId})">-</button>
+        </div>
+        <div class="col-span-2 flex pr-5 py-5 items-center">
+          <img src="${currentUserImage}" alt="${currentUserUsername}" class="w-10 mr-5">
+          <strong class=" text-[#324152]">${currentUserUsername}</strong><div class="text-white text-sm bg-indigo-800 pb-1 px-3 mx-2 rounded">you</div>
+          <p class="text-[#67727e]">now</p>
+          <button class="ml-auto flex text-red-500 items-center gap-2 mr-3" onclick="deleteComment(${commentId}, undefined)"><img src="./resource/images/icon-delete.svg" alt=""> <strong>Delete</strong></button>
+          <button class="ml-3 flex text-[#5457b6] items-center gap-2" onclick="editComment(${commentId})"><img src="./resource/images/icon-edit.svg" alt=""><strong>Edit</strong></button>
+
+        </div>
+        <div class="comment-content break-all w-[800px] row-span-2 col-span-1 mb-5 text-[#67727e]">${message}</div>
+      </div>
+    </article>`;
+
+  // Yeni div'i "yazdirilanYazilar" div öğesine ekleyin
+  var yazdirilanYazilarElement = document.getElementById("jsonContainer");
+
+  // Yeni mesajı en başa ekleyin
+  var lastChild = yazdirilanYazilarElement.lastChild; // Son öğeyi al
+  var secondToLastChild = lastChild.previousSibling; // Son öğenin bir önceki kardeşini al
+
+  yazdirilanYazilarElement.insertBefore(newMessage, secondToLastChild); // Yeni öğeyi ikinci sondan önceki öğenin önüne ekle
+
+  commentId++;
+  replyId++;
+  inputElement.value = "";
+
+    // Yorumu local storage'a kaydedelim
+    saveToLocalStorage(commentId, replyId, currentUserUsername, currentUserImage, message);
+}
+
+// Local storage'a yorumu kaydetmek için bir fonksiyon ekleyelim
+function saveToLocalStorage(commentId, replyId, currentUserUsername, currentUserImage, message) {
+  const data = {
+    commentId: commentId,
+    replyId: replyId,
+    score:commentId,
+    currentUserUsername: currentUserUsername,
+    currentUserImage: currentUserImage,
+    message: message
+  };
+
+    test1= commentId;
+  // Local storage'a veriyi ekleyelim
+  localStorage.setItem(`comment-${commentId}`, JSON.stringify(data));
+}
+  
+function fetchFromLocalStorage() {
+  // LocalStorage'da kayıtlı tüm yorumları alın
+  const allComments = Object.keys(localStorage)
+    .filter(key => key.startsWith("comment-"))
+    .map(key => JSON.parse(localStorage.getItem(key)));
+
+  // Verileri ekrana yansıtın
+  const container = document.getElementById("jsonContainer");
+  container.innerHTML = ''; // Önceki içeriği temizle
+
+  allComments.forEach(commentData => {
+    const commentId = commentData.commentId;
+    const currentUserImage = commentData.currentUserImage;
+    const currentUserUsername = commentData.currentUserUsername;
+    const message = commentData.message;
+
+    const commentDiv = document.createElement('div');
+    commentDiv.setAttribute('id', `comment-${commentId}`);
+    commentDiv.innerHTML = `
+      <article class="rounded-md w-[95%] ml-auto mt-5">
+        <div class="grid grid-rows-1 grid-flow-col gap-0 bg-white rounded">
+          <div class="row-span-3 w-[26px] my-auto flex flex-col mx-5 px-2 bg-[#eaecf1] rounded-md text-[#c3c4ef] font-bold">
+            <button class="hover:text-indigo-700" onclick="increaseScore(${commentId})">+</button>
+            <strong class="text-[#5457b6]" id="score-${commentId}">${score}</strong>
+            <button class="hover:text-indigo-700" onclick="decreaseScore(${commentId})">-</button>
+          </div>
+          <div class="col-span-2 flex pr-5 py-5 items-center">
+            <img src="${currentUserImage}" alt="${currentUserUsername}" class="w-10 mr-5">
+            <strong class=" text-[#324152]">${currentUserUsername}</strong>
+            <div class="text-white text-sm bg-indigo-800 pb-1 px-3 mx-2 rounded">you</div>
+            <p class="text-[#67727e]">now</p>
+            <button class="ml-auto flex text-red-500 items-center gap-2 mr-3" onclick="deleteComment(${commentId})"><img src="./resource/images/icon-delete.svg" alt=""> <strong>Delete</strong></button>
+            <button class="ml-3 flex text-[#5457b6] items-center gap-2" onclick="editComment(${commentId})"><img src="./resource/images/icon-edit.svg" alt=""><strong>Edit</strong></button>
+          </div>
+          <div class="comment-content break-all w-[800px] row-span-2 col-span-1 mb-5 text-[#67727e]">${message}</div>
+        </div>
+      </article>
+    `;
+
+    container.appendChild(commentDiv);
+  });
+}
+
+// Sayfa yüklendiğinde veya başka bir yerde verileri local storage'dan almak için bu fonksiyonu çağırın
+document.addEventListener('DOMContentLoaded', fetchFromLocalStorage);
+
+function replyComment(currentUser, currentUserImage, commentId, replyId) {
+  if (isReplying) {
+    console.log('reply is already in progress.');
+    return;
+  }
+  isReplying = true;
+
+  console.log('CurrentUser:', currentUser, 'CurrentUserImage:', currentUserImage, 'CommentId:', commentId, 'ReplyId:', replyId);
+
+  // Yeni bir div oluşturup içeriğe cevap gönderme kutusunu ekliyoruz
+  const replyFormHTML = `
+    <div class="w-[95%] bg-white rounded flex ml-auto mt-5 pb-5 pt-5 items-center reply-form" data-comment-id="${commentId}" data-reply-id="${replyId}">
+      <img src="${currentUserImage}" alt="${currentUser}" class="w-10 ml-5">
+      <input type="text" id="replyComment" placeholder="Add a comment..." class="border border-slate-200 placeholder-slate-400 contrast-more:border-slate-400 contrast-more:placeholder-slate-500 w-3/4 my-auto mt-2 p-5 mx-auto">
+      <button class="ml-auto bg-indigo-800 text-white h-10 inline-flex items-center px-5 rounded mr-5" onclick="submitReplyForm(this, '${currentUser}', '${currentUserImage}', ${commentId}, ${replyId})"><strong>REPLY</strong></button>
+    </div>
+  `;
+
+  // Yeni bir div oluşturalım ve içeriğe cevap gönderme kutusunu ekleyelim
+  const replyDiv = document.createElement('div');
+  replyDiv.innerHTML = replyFormHTML;
+
+  // Cevap gönderme kutusunu yorumun altına eklemek için uygun parent elementi seçelim
+  let parentElement;
+  if (replyId) {
+    // Eğer bir yanıta cevap veriliyorsa, ilgili yanıt div'inin altına ekleyelim
+    parentElement = document.getElementById(`reply-${replyId}`);
+  } else {
+    // Eğer bir yoruma cevap veriliyorsa, ilgili yorum div'inin yanına ekleyelim
+    parentElement = document.getElementById(`comment-${commentId}`);
+
+    // Yanıt gönderme kutusunu yorumun yanına ekleyelim
+    parentElement.parentNode.insertBefore(replyDiv, parentElement.nextSibling);
+  }
+
+  // Cevap gönderme kutusunu parentElement'in altına ekleyelim
+  parentElement.appendChild(replyDiv);
+
+  // Yorumun yanıtlama alanını oluşturulmuş yorumlar listesine ekleyelim
+  createdReplySet.add(getUniqueReplyId(commentId, replyId)); // replyId'yi de ekleyelim
+
+  // Oluşturulan cevap gönderme formunu listeye ekleyelim
+  createdReplyForms.push({ commentId, replyId });
+}
+
+function isReplyFormCreated(commentId, replyId) {
+  return createdReplyForms.some(form => form.commentId === commentId && form.replyId === replyId);
+}
+
+function submitReplyForm(button, currentUserUsername, currentUserImage, commentId, replyId) {
+  var inputElement = document.getElementById("replyComment");
+  var replyMessage = inputElement.value;
+
+  var repliesDiv = document.createElement('div');
+  repliesDiv.setAttribute('class', '');
+  // Create a new div element for the reply
+  var newMessage = document.createElement("div");
+  newMessage.setAttribute('id', `comment-${test1}`); 
+  newMessage.innerHTML = `
+    <article class="rounded-md w-[95%] ml-auto mt-5">
+      <div class="grid grid-rows-1 grid-flow-col gap-0 bg-white rounded">
+        <div class="row-span-3 w-[26px] my-auto flex flex-col mx-5 px-2 bg-[#eaecf1] rounded-md text-[#c3c4ef] font-bold">
+          <button class="hover:text-indigo-700" onclick="increaseScoreReply(${commentId}, ${test3})">+</button>
+          <strong class="text-[#5457b6]" id="score-${test3}">${score}</strong>
+          <button class="hover:text-indigo-700" onclick="decreaseScoreReply(${commentId}, ${test3})">-</button>
+        </div>
+        <div class="col-span-2 flex pr-5 py-5 items-center">
+          <img src="${currentUserImage}" alt="${currentUserUsername}" class="w-10 mr-5">
+          <strong class=" text-[#324152]">${currentUserUsername}</strong>
+            <div class="text-white text-sm bg-indigo-800 pb-1 px-3 mx-2 rounded">you</div> <p class="text-[#67727e]">now</p>
+            <button class="ml-auto flex text-red-500 items-center gap-2 mr-3" onclick="deleteComment(${test1})"><img src="./resource/images/icon-delete.svg" alt=""> <strong>Delete</strong></button>
+            <button class="ml-3 flex text-[#5457b6] items-center gap-2" onclick="editComment(${test1})"><img src="./resource/images/icon-edit.svg" alt=""><strong>Edit</strong></button>
+          </div>
+          <div class="comment-content break-all w-[800px] row-span-2 col-span-1 mb-5 text-[#67727e]">${replyMessage}</div>
+        </div>
+    </article>
+  `;
+  repliesDiv.appendChild(newMessage);
+  
+
+
+// Find the parent element where the reply should be appended
+let parentElement;
+if (replyId) {
+  // If replying to a reply, find the parent reply div
+  parentElement = document.getElementById(`reply-${replyId}`);
+} else {
+  // If replying to a comment, find the parent comment container
+  parentElement = document.getElementById(`comment-${commentId}`);
+}
+
+// Append the reply container to the parent element
+parentElement.appendChild(repliesDiv);
+  // Append the new reply to the parent element
+  parentElement.appendChild(newMessage);
+
+  // Remove the reply form (button's parent element)
+  const replyForm = button.parentElement;
+  replyForm.remove();
+
+  isReplying = false;
+  test1++;
+  test2++;
+  test3++;
+  console.log('test3');
+
+  // Remove the reply form from the createdReplyForms list
+  createdReplyForms = createdReplyForms.filter(form => !(form.commentId === commentId && form.replyId === replyId));
+}
+
+function increaseScore(commentId) {
+  const scoreElement = document.getElementById(`score-${commentId}`);
+  if (scoreElement) {
+    let score = parseInt(scoreElement.textContent);
+    score++;
+    scoreElement.textContent = score;
+  } else {
+    console.error(`Score element with ID "score-${commentId}" not found.`);
+  }
+}
+
+function decreaseScore(commentId) {
+const scoreElement = document.getElementById(`score-${commentId}`);
+let score = parseInt(scoreElement.textContent);
+score--;
+scoreElement.textContent = score;
+}
+
+function increaseScoreReply(commentId, replyId) {
+const scoreElement = document.getElementById(`score-${replyId}`);
+let score = parseInt(scoreElement.textContent);
+score++;
+scoreElement.textContent = score;
+}
+
+function decreaseScoreReply(commentId, replyId) {
+const scoreElement = document.getElementById(`score-${replyId}`);
+let score = parseInt(scoreElement.textContent);
+score--;
+scoreElement.textContent = score;
+}
+
+// Edit ve Delete işlemleri için fonksiyonlar
+function editComment(commentId, replyId) {
+  // Eğer zaten edit işlemi yapılıyorsa, tekrar edit butonuna basmayı engelle
+  if (isEditing) {
+    console.log('Edit is already in progress.');
+    return;
+  }
+
+  const commentDiv = document.getElementById(`comment-${commentId}`);
+
+  // Yanıtı düzenliyorsak, yanıtın bulunduğu elementi alalım
+  let contentElement;
+  if (replyId !== undefined) {
+    contentElement = document.getElementById(`reply-${getUniqueReplyId(commentId, replyId)}`)?.querySelector('.comment-content');
+  } else {
+    contentElement = commentDiv?.querySelector('.comment-content');
+  }
+
+  if (!contentElement) {
+    console.error('Content element not found.');
+    return;
+  }
+  // Edit işlemi başladığında flag'i true yapalım
+  isEditing = true;
+
+  // Mevcut içeriği alalım
+  const currentContent = contentElement.textContent;
+
+  // İçeriği düzenleyebilecek bir input alanı oluşturalım
+  const inputElement = document.createElement('input');
+  inputElement.type = 'text';
+  inputElement.value = currentContent;
+  inputElement.className = 'border border-slate-200 placeholder-slate-400 contrast-more:border-slate-400 contrast-more:placeholder-slate-500 w-full my-auto mt-2 p-5 mx-auto';
+
+  // Kaydet butonunu oluşturalım
+  const saveButton = document.createElement('button');
+  saveButton.className = 'ml-auto bg-indigo-800 text-white h-10 inline-flex items-center px-5 rounded';
+  saveButton.innerHTML = '<strong>UPDATE</strong>';
+  saveButton.onclick = () => {
+    saveEditedComment(commentId, replyId, inputElement.value);
+    // Kaydetme işlemi tamamlandığında flag'i false yapalım
+    isEditing = false;
+  };
+
+  // İçeriği düzenleyebilecek input ve kaydet butonunu içeren bir div oluşturalım
+  const editDiv = document.createElement('div');
+  editDiv.className = 'my-0 mx-5 flex p-0 gap-5 grid items-center';
+  editDiv.appendChild(inputElement);
+  editDiv.appendChild(saveButton);
+
+  // Mevcut içeriği düzenleme alanını silelim ve yeni düzenleme alanını ekleyelim
+  contentElement.innerHTML = '';
+  contentElement.appendChild(editDiv);
+}
+
+function deleteComment(commentId, replyId) {
+    // Eğer replyId tanımlı ise, yanıtı silme işlemi yapılacak
+    if (replyId !== undefined) {
+      // Uyarı mesajını modal olarak göster
+      const modal = document.getElementById('myModal');
+      modal.style.display = 'flex';
+
+      // Yorum ve yanıt id'sini saklayalım
+      document.getElementById('commentIdToDelete').value = commentId;
+      document.getElementById('replyIdToDelete').value = replyId;
+    } else {
+      // Eğer replyId tanımlı değilse, yorumu silme işlemi yapılacak
+      // Uyarı mesajını modal olarak göster
+      const modal = document.getElementById('myModal');
+      modal.style.display = 'flex';
+      // Sadece yorum id'sini saklayalım
+      document.getElementById('commentIdToDelete').value = commentId;
+      document.getElementById('replyIdToDelete').value = ''; // replyId boş bırakalım
+    }
+    commentId--;
+    replyId--;
+    test1--;
+    test2--;
+  }
+
+  function saveEditedComment(commentId) {
+  const commentDiv = document.getElementById(`comment-${commentId}`);
+  const commentContentElement = commentDiv.querySelector('.comment-content');
+  
+  // Düzenlenmiş yorum içeriğini alıyoruz
+  const editedCommentContent = commentContentElement.querySelector('input').value;
+  
+  // Düzenlenmiş yorum içeriğini gösteriyoruz
+  commentContentElement.innerHTML = editedCommentContent;
+}
+  // Modalı gizlemek için fonksiyon (aynı kaldı)
+  function closeModal() {
+    const modal = document.getElementById('myModal');
+    modal.style.display = 'none';
+  }
+
+  // Silmeyi onayladığında çalışacak fonksiyon (güncellendi)
+  function confirmDelete() {
+    closeModal(); // Modalı gizlemek için
+
+    // Silme işlemlerini gerçekleştir
+    const commentId = document.getElementById('commentIdToDelete').value;
+    const replyId = document.getElementById('replyIdToDelete').value;
+
+    // Burada yapılacak işlemi tanımlayabilirsiniz
+    if (replyId !== '') {
+      console.log('Delete button clicked for reply:', replyId);
+      const replyElement = document.getElementById(`reply-${replyId}`);
+      if (replyElement) {
+        replyElement.remove();
+      }
+    } else {
+      console.log('Delete button clicked for comment:', commentId);
+      const commentElement = document.getElementById(`comment-${commentId}`);
+      if (commentElement) {
+        commentElement.remove();
+      }
+    }
+  }
+
+
+// CommentId ve ReplyId'yi birleştirerek benzersiz bir yanıt ID'si oluşturuyoruz
+function getUniqueReplyId(commentId, replyId) {
+  return replyId ? `${commentId}-reply-${replyId}` : `${commentId}-comment`;
+}
+        // Sayfa yüklendiğinde JSON verisini göstermek için çalıştırıyoruz
+        document.addEventListener('DOMContentLoaded', fetchAndUpdateScore);
+
+</script>
+</body>
+</html>

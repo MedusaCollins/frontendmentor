@@ -1,0 +1,126 @@
+:root{
+    --clr-red: hsl(1, 90%, 64%);
+    --clr-blue: hsl(219, 85%, 26%);
+    --clr-white: hsl(0, 0%, 100%);
+
+
+    --clr-vlg-blue: hsl(228, 56%, 98%);
+    --clr-lg-blue: hsl(211, 68%, 94%);
+    --clr-lg-blue2: hsl(205, 33%, 90%);
+    --clr-g-blue: hsl(219, 14%, 63%);
+    --clr-dg-blue: hsl(219, 12%, 42%);
+    --clr-vd-blue: hsl(224, 21%, 14%);
+
+    --fw-reg: 500;
+    --fw-bold: 800;
+}
+
+body{
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--clr-vlg-blue);
+    font-size: 16px;
+    margin: 0;
+    color: var(--clr-dg-blue);
+    padding: 0;
+    font-weight: var(--fw-reg);
+}
+
+h2{
+    color: var(--clr-vd-blue);
+    width: 50%;
+    margin: 0; 
+    float: left;
+    height: 50px;
+}
+p{
+    font-size: 19px;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 50%;
+    height: 50px;
+    text-align: end;
+}
+b, span{
+    font-weight: var(--fw-bold);
+    color: black;
+}
+span{
+    color: var(--clr-dg-blue);
+}
+
+.container{
+    margin: auto;
+    padding: 20px;
+    background-color: var(--clr-white);
+    width: 660px;
+    border-radius: 10px;
+    margin-top: 150px;
+}
+.badge{
+    background: var(--clr-blue);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 19px;
+    width: 30px;
+    padding: 2px;
+    height: 25px;
+    margin-left: 15px;
+    position: absolute;
+    text-align: center;
+}
+
+.notification{
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 8px;
+}
+.unread{
+    background-color: var(--clr-vlg-blue);
+}
+.dot {
+    height: 10px;
+    width: 10px;
+    margin-left: 10px;
+    background-color: var(--clr-red);
+    border-radius: 50%;
+    display: inline-block;
+  }
+.profile{
+    display: flex;
+    gap: 20px;
+}
+.profile>img{
+    width: 40px;
+    height: 40px;
+}
+.message{
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 5px;
+    padding: 20px;
+    border-color: var(--clr-lg-blue2);
+}
+.message:hover{
+    background-color: var(--clr-lg-blue);
+    cursor: pointer;
+    border-color: var(--clr-lg-blue);
+}
+
+.hoverable:hover{
+    cursor: pointer;
+    color: var(--clr-blue);
+}
+
+.chess{
+    margin-left: 165px;
+}
+@media(max-width: 750px) {
+    .container{
+        margin-top: 100px;
+        width: 360px;
+        padding: 10px;
+    }
+    .chess{
+        margin-left: 0;
+    }
+}

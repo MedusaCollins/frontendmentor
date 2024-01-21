@@ -1,0 +1,128 @@
+
+:root{
+    --ff-primary: 'Big Shoulders Display', cursive;
+    --ff-secondary: 'Lexend Deca', sans-serif;
+    --fs: 15px;
+    --fw-primary: 400;
+    --fw-secondary: 700;
+
+    --clr-w-orange: hsl(31, 77%, 52%);
+    --clr-d-cyan: hsl(184, 100%, 22%);
+    --clr-vd-cyan: hsl(179, 100%, 13%);
+    --clr-w: hsl(0, 0%, 95%);
+    --clr-vd-gray: hsla(0, 0%, 100%, 0.75);
+
+
+}
+
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--clr-w);
+    color: var(--clr-w);
+    font-size: var(--fs);
+}
+
+/* Container */
+.container-main{
+    margin: 10px;
+    margin-top: 70px;
+    margin-bottom: 70px;
+}
+
+.container-sedans, .container-suvs, .container-luxury{
+    padding: 3em;
+    font-family: var(--ff-primary);
+    
+}
+p{
+    color: var(--clr-vd-gray);
+    font-family: var(--ff-secondary);
+    line-height: 25px;
+}
+
+/* Container-Sedans */
+.container-sedans{
+    background-color: var(--clr-w-orange);
+    border-radius: 10px 10px 0 0;
+}
+.container-sedans .btn{
+    color: var(--clr-w-orange);
+}
+
+/* Container-Suvs */
+.container-suvs{
+    background-color: var(--clr-d-cyan);
+}
+.container-suvs .btn{
+    color: var(--clr-d-cyan);
+}
+
+/* Container-Luxury */
+.container-luxury{
+    background-color: var(--clr-vd-cyan);
+    border-radius: 0 0 10px 10px;
+}
+.container-luxury .btn{
+    color: var(--clr-vd-cyan);
+}
+
+.btn{
+    background-color: #fff;
+    max-width: 100px;
+    padding: 10px;
+    border-radius: 20px;
+    text-align: center;
+    margin-top: 20px;
+    font-family: var(--ff-secondary);
+    font-weight: var(--fw-primary);
+    font-size: 13px;
+    border: 2px solid;
+}
+
+.btn:hover{
+    color: var(--clr-w);
+    border-color: var(--clr-w);
+    size: -1%;
+    cursor: pointer;
+}
+
+.container-sedans .btn:hover{
+    background-color: var(--clr-w-orange);
+}
+.container-suvs .btn:hover{
+    background-color: var(--clr-d-cyan);
+}
+.container-luxury .btn:hover{
+    background-color: var(--clr-vd-cyan);
+}
+
+@media (min-width: 1440px){
+    .container-main{
+        display: grid;
+        position: relative;
+        grid-template-columns: auto auto auto;
+        max-width: 920px;
+        height: 500px;
+        top: 150px;   
+    }
+
+    .container-logo{
+        margin-bottom: 10px;
+    }
+    .container-main p{
+        max-width: 200px;
+    }
+    .container-sedans{
+        border-radius: 10px 0 0 10px;
+    }
+    .container-luxury{
+        border-radius: 0 10px 10px 0;
+    }
+    .btn{
+        position: absolute;
+        bottom: 50px;
+        width: 200px;
+    }
+}

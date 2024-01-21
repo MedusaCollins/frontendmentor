@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- displays site properly based on user's device -->
+
+  <link rel="icon" type="image/png" sizes="32x32" href="resource/images/favicon-32x32.png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Mukta:wght@200;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700&family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="resource/css/style.css">
+  <title>Frontend Mentor | Product preview card component</title>
+  <style>
+    .attribution { font-size: 11px; text-align: center; }
+    .attribution a { color: hsl(228, 45%, 44%); }
+  </style>
+</head>
+<body>
+<section>
+  <div class="container">
+        <img src="resource/images/image-product-mobile.jpg" alt="" width="370px" style="border-radius: 10px 10px 0 0" class="mobile">
+        <img src="resource/images/image-product-desktop.jpg" alt="" width="300px" style="border-radius: 10px 0 0 10px;" class="desktop">
+
+      <div class="col-text">
+        <p style="letter-spacing: 5px; margin-top: 30px; color: var(--clr-grayblue);">PERFUME</p><br>
+
+        <h1>Gabrielle<br class="desktop"> Essence<br class="mobile"> Eau<br class="desktop"> De Parfum</h1><br class="mobile"><br class="desktop">
+      
+        <div class="description">A floral, solar and voluptuous<br class="desktop"><br class="mobile"> interpretation composed by<br class="desktop"> Olivier<br class="mobile"> Polge,
+        Perfumer-Creator<br class="desktop"> for the House of<br class="mobile"> CHANEL.<br class="desktop"></div>
+        
+        <div class="price">
+          <div class="new">$149.99</div> <div class="old">$169.99</div><br>
+        </div>
+        <button class="buy"> <img src="/resource/images/icon-cart.svg" alt="" width="15px" style="margin-right: 5px">Add to Cart</button>
+      </div>
+  </div>
+</section>
+</body>
+</html>

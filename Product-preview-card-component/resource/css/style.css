@@ -1,0 +1,113 @@
+:root{
+    --clr-darkblue: hsl(158, 36%, 37%);
+    --clr-cream: hsl(30, 38%, 92%);
+    --clr-vdarkblue: hsl(114, 23%, 25%);
+    --clr-grayblue: hsl(228, 12%, 48%);
+    --clr-white: hsl(0, 0%, 100%);
+
+    --fs: 14px;
+    --fw-thin: 500;
+    --fw-reg: 700;
+}
+
+body{
+    font-family: 'Fraunces', serif;
+    font-family: 'Montserrat', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--clr-cream);
+}
+
+
+h1{
+    font-family: 'Fraunces', serif;
+    font-size: 38px;
+    margin: 0px;
+    line-height: 40px;
+}
+p{
+    font-family: 'Montserrat', sans-serif;
+    line-height: 40px;
+}
+.description{
+    color: var(--clr-grayblue);
+}
+
+.container{
+    margin: 10px;
+    margin-top: 150px;
+    margin-bottom: 100px;
+    background-color: var(--clr-white);
+    border-radius: 10px;
+}
+
+.col-text{
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+.price{
+    display: flex;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.new{
+    color: var(--clr-darkblue);
+    font-size: 30px;
+    margin-right: 10px;
+    font-family: 'Fraunces', serif;
+}
+.old{
+    text-decoration-line: line-through;
+    text-align: center;
+    margin-top: 10px;
+    margin-left: 10px;
+    color: var(--clr-grayblue);
+}
+
+.buy{
+    background-color: var(--clr-darkblue);
+    color: var(--clr-white);
+    border-radius: 5px;
+    border: 0;
+    margin-bottom: 30px;
+    width: 250px;
+    height: 50px;
+    font-size: 15px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.buy:hover{
+    background-color: var(--clr-vdarkblue);
+    cursor:pointer;
+}
+
+@media (max-width: 1441px){
+    .desktop{
+        display: none !important;
+    }
+    .mobile{
+        display: visible !important;
+    }
+    .container{
+        display: block;
+        max-width: 370px;
+    }
+    .buy{
+        width: 310px;
+    }
+}
+@media (min-width: 1440px){
+    .container{
+        margin-top: 200px;
+        display: flex;
+    }
+    .desktop{
+        display: visible !important;
+    }
+    .mobile{
+        display: none !important;
+    }
+    
+}
